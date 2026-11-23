@@ -1,56 +1,104 @@
-/* Template Projet Web — contrôle et validation des saisies (côté navigateur)
-   Utilisé par la page de connexion/inscription et par le formulaire du Back Office.
-   Règles déclarées dans le HTML : data-rule="required | email | age | password | optional". */
-(function () {
-  'use strict';
+var EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+var MESSAGE_OBLIGATOIRE = 'Ce champ est obligatoire.';
+var MESSAGE_EMAIL = 'Veuillez saisir une adresse e-mail valide.';
+var MESSAGE_AGE = "L'âge doit être un nombre entre 1 et 120.";
 
-  var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+function lireRegles(champ) {
+  var texteRegles = champ.getAttribute('data-rule');
+  if (texteRegles === null) {
+    texteRegles = '';
+  }
+  return texteRegles.split(' ');
+}
 
-  // Règles déclarées dans le HTML : data-rule="required | email | age | name"
-  function check(input) {
-    var rules = (input.getAttribute('data-rule') || '').split(' ');
-    var v = input.value.trim();
-    if (rules.indexOf('password') !== -1) v = input.value; // le mot de passe n'est pas "trimmé"
+function trouverGroupe(champ) {
+  return champ.closest('.form-group, label');
+}
 
-    if (rules.indexOf('optional') !== -1 && v === '') return '';
-    if (v === '') return 'Ce champ est obligatoire.';
-    if (rules.indexOf('email') !== -1 && !EMAIL_RE.test(v)) return 'Veuillez saisir une adresse e-mail valide.';
-    if (rules.indexOf('age') !== -1) {
-      var n = Number(v);
-      if (!/^\d+$/.test(v) || n < 1 || n > 120) return 'L\'âge doit être un nombre entre 1 et 120.';
-    }
+function verifierChamp(champ) {
+  var regles = lireRegles(champ);
+  var valeur = champ.value.trim();
+  if (regles.includes('password')) {
+    valeur = champ.value;
+  }
+  if (regles.includes('optional') && valeur === '') {
     return '';
   }
-
-  function show(input, message) {
-    var group = input.closest('.form-group, label');
-    if (!group) return;
-    var box = group.querySelector('.field-error');
-    group.classList.toggle('has-error', message !== '');
-    if (box) box.textContent = message;
+  if (valeur === '') {
+    return MESSAGE_OBLIGATOIRE;
   }
+  if (regles.includes('email')) {
+    var emailEstValide = EMAIL_REGEX.test(valeur);
+    if (!emailEstValide) {
+      return MESSAGE_EMAIL;
+    }
+  }
+  if (regles.includes('age')) {
+    var age = Number(valeur);
+    var estUnEntier = /^\d+$/.test(valeur);
 
-  document.querySelectorAll('form[data-validate]').forEach(function (form) {
-    var fields = form.querySelectorAll('[data-rule]');
+    if (!estUnEntier || age < 1 || age > 120) {
+      return MESSAGE_AGE;
+    }
+  }
+  return '';
+}
 
-    fields.forEach(function (input) {
-      input.addEventListener('blur', function () { show(input, check(input)); });
-      input.addEventListener('input', function () {
-        if (input.closest('.form-group, label').classList.contains('has-error')) show(input, check(input));
-      });
-    });
+function afficherErreur(champ, message) {
+  var groupe = trouverGroupe(champ);
+  if (groupe === null) {
+    return;
+  }
+  var zoneErreur = groupe.querySelector('.field-error');
+  if (message === '') {
+    groupe.classList.remove('has-error');
+  } else {
+    groupe.classList.add('has-error');
+  }
+  if (zoneErreur !== null) {
+    zoneErreur.textContent = message;
+  }
+}
 
-    form.addEventListener('submit', function (e) {
-      var firstBad = null;
-      fields.forEach(function (input) {
-        var msg = check(input);
-        show(input, msg);
-        if (msg && !firstBad) firstBad = input;
-      });
-      if (firstBad) {
-        e.preventDefault();
-        firstBad.focus();
-      }
-    });
+function surveillerChamp(champ) {
+  champ.addEventListener('blur', function () {
+    var message = verifierChamp(champ);
+    afficherErreur(champ, message);
   });
-})();
+  champ.addEventListener('input', function () {
+    var groupe = trouverGroupe(champ);
+    var dejaEnErreur = false;
+    if (groupe !== null && groupe.classList.contains('has-error')) {
+      dejaEnErreur = true;
+    }
+    if (dejaEnErreur) {
+      var message = verifierChamp(champ);
+      afficherErreur(champ, message);
+    }
+  });
+}
+
+function surveillerFormulaire(formulaire) {
+  var champs = formulaire.querySelectorAll('[data-rule]');
+  for (var i = 0; i < champs.length; i++) {
+    surveillerChamp(champs[i]);
+  }
+  formulaire.addEventListener('submit', function (evenement) {
+    var premierChampInvalide = null;
+    for (var j = 0; j < champs.length; j++) {
+      var message = verifierChamp(champs[j]);
+      afficherErreur(champs[j], message);
+      if (message !== '' && premierChampInvalide === null) {
+        premierChampInvalide = champs[j];
+      }
+    }
+    if (premierChampInvalide !== null) {
+      evenement.preventDefault();
+      premierChampInvalide.focus();
+    }
+  });
+}
+var formulaires = document.querySelectorAll('form[data-validate]');
+for (var k = 0; k < formulaires.length; k++) {
+  surveillerFormulaire(formulaires[k]);
+}
