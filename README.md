@@ -1,213 +1,216 @@
+# Module 6/6 — Validation des saisies (JavaScript) + intégration finale
 
+Module de **Youssef Khmiri** pour le projet **Template Projet Web** (clinique MEDLINK) :
+contrôle et validation des saisies côté navigateur en **JavaScript**, puis **intégration
+finale** de tous les modules sur la branche principale.
 
-<!-- Start of picture text -->
-I Se former autrement<br>HONORS UNITED UNIVERSITIES<br><!-- End of picture text -->
+## Description
 
-## **Guide pour Rédiger un README de Qualité pour un Repository GitHub Année universitaire : 2026-2027** 
+### Objectif
 
-# **Objectif :** 
+Fournir un script unique de validation (`views/assets/app.js`) réutilisable par **tous** les
+formulaires du site, sans framework et sans dépendance externe, puis vérifier l'ensemble du
+projet une fois les autres modules fusionnés.
 
-- Comprendre l'importance d'un README bien structuré dans un projet GitHub. 
+### Problème résolu
 
-- Rédiger un README clair, détaillé et engageant en suivant les bonnes pratiques. 
+Sans ce module, chaque formulaire devrait réimplémenter ses contrôles, et l'utilisateur
+découvrirait ses erreurs seulement après l'envoi au serveur. `app.js` centralise les règles
+déclarées dans le HTML (`data-rule`), affiche les messages au bon endroit et bloque l'envoi
+d'un formulaire invalide — ce qui évite des allers-retours inutiles vers le serveur.
 
-- Structurer efficacement un fichier README avec des sections pertinentes. 
+### Fonctionnalités principales
 
-- Fournir des instructions précises pour l'installation, la configuration et l'utilisation d'un projet. 
+- Règles déclaratives dans le HTML : `required`, `email`, `age`, `password`, `optional`.
+- Message d'erreur affiché **sous le champ concerné** (classes `has-error` / `field-error`).
+- Contrôle au `blur`, puis à chaque frappe une fois le champ en erreur.
+- Blocage de l'envoi (`preventDefault`) et focus sur le premier champ fautif.
+- Aucune donnée n'est « nettoyée » à l'insu de l'utilisateur : le mot de passe conserve ses
+  espaces.
+- Intégration finale : ordre de fusion, tests de bout en bout, `index.php` de redirection et
+  README du repository.
 
-- Encourager et faciliter la contribution externe grâce à une documentation bien définie. 
+## Table des matières
 
-# **Étapes à suivre :** 
+- [Fichiers du module](#fichiers-du-module)
+- [Installation](#installation)
+- [Utilisation](#utilisation)
+- [Intégration finale](#intégration-finale)
+- [Scénarios de test](#scénarios-de-test)
+- [Contribution](#contribution)
+- [Licence](#licence)
 
-Un bon fichier README est essentiel pour tout projet GitHub. Il sert de point d'entrée pour les développeurs, les contributeurs et les utilisateurs. 
+## Fichiers du module
 
-**1. Créer un repository GitHub** (si ce n'est pas encore fait) : 
+| Fichier | Rôle |
+| --- | --- |
+| `views/assets/app.js` | Script de validation des formulaires. |
+| `index.php` (racine) | Redirige `http://localhost/Template%20Projet%20Web/` vers `views/FrontOffice/index.php`. |
 
-   - Render-vous sur GitHub. `o` Cliquer sur **New Repository** . `o` Donner un nom au repository (ex: **readme-guide** ). `o` Ajouter une description et initialiser le repository avec un fichier **README.md** 
+## Installation
 
+Ce module s'installe **dans** le projet : il ne fonctionne pas seul.
 
+1. Clonez le repository du projet :
+
+   ```bash
+   git clone https://github.com/votre-utilisateur/Template-Projet-Web.git
+   cd "Template Projet Web"
+   git checkout feature/input-validation
+   ```
 
-<!-- Start of picture text -->
-=O) Proiettecmolosies-nob-28 / resdme-guide aves Jeseech | (e]-) i (+ - ](o}{n) (a) @<br><> Code © Issues [1 Pullrequests ©) Actions [Fj Projects (1 wiki © Security [~ Insights Settings<br>readme-guide Pvbiic 9 EditPins~ @Watch 0 + Y Fork O ~ yy Str Oo +<br>P main = ¥ 1Branch © 0 Tags Q Gototie Ne About ry<br>B oumeima-tbnetfekih Initial commit Guide détaillé pour rédigerun bon<br>19457¢39-28 minutesago © 1Commit README sur GitHub.<br>(3 README.md Initial commit 28 minutes ago ‘1 Readme<br>Ae Activity<br>a 2 & Custom properties<br>a W Ostars<br>© ovwatching<br>readme-guide ¥ Oforks<br>Report repository<br>Guide détaillé pour rédiger un bon README sur GitHub.<br>Releases<br><!-- End of picture text -->
+2. Vérifiez la présence des deux fichiers :
 
-_Figure 1: readme guide repositorie_ 
+   - `views/assets/app.js`
+   - `index.php` à la racine du projet
 
-1 
+3. Placez le dossier du projet dans `htdocs` (XAMPP) ou `www` (WAMP), puis démarrez
+   **Apache** et **MySQL**. La base `gestion_utilisateurs` et la table `users` se créent au
+   premier chargement (sinon, importez `database.sql` dans phpMyAdmin).
 
-**2. Cloner le repository en local** : 
+4. Aucune configuration n'est nécessaire : `app.js` est chargé automatiquement par les pages
+   qui l'utilisent (`views/FrontOffice/login.php`, `views/BackOffice/_footer.php`).
 
-   - git clone https://github.com/Projet-technologies-web-2A/readme-guide.git `o` cd readme-guide 
+## Utilisation
 
-**3. Créer ou modifier le fichier README.md** : Ouvrir le fichier avec un éditeur de texte (VS Code, Sublime Text, etc.) 
+### Déclarer un champ validé
 
-**4. A chaque modification dans le fichier readme.md et le projet, ajouter, valider et faire un push des modifications** : 
+Ajoutez l'attribut `data-rule` sur le champ et un emplacement pour le message dans son groupe :
 
+```html
+<div class="form-group">
+  <label for="email">E-mail</label>
+  <input type="email" id="email" name="email" data-rule="required email">
+  <div class="field-error"></div>
+</div>
+```
 
+Le formulaire doit porter l'attribut `data-validate` :
 
-<!-- Start of picture text -->
-e readme-guide 8 ened<br>@ README.md MX BM O- — exporer ~ ie<br>@ README.md > G3 # readme-guide > OPEN EDITORS<br>1 # readme-guide \v README-GUIDE<br>2] Guide détaillé pour rédiger un bon README @ README md a<br>{sur GitHub pour le module projet<br>| technologies web 2A. @<br><!-- End of picture text -->
+```html
+<form method="post" action="controllers/UserController.php?action=login" data-validate>
+```
 
-_Figure 2: Contenu du fichier readme avec vs code_ 
+### Règles disponibles
 
-- git add . 
+| Règle | Contrôle effectué |
+| --- | --- |
+| `required` | Champ obligatoire. |
+| `email` | Format d'adresse e-mail valide (expression régulière). |
+| `age` | Entier compris entre 1 et 120. |
+| `password` | Le mot de passe n'est pas « nettoyé » (espaces conservés). |
+| `optional` | Un champ vide est accepté (ex. mot de passe lors d'une modification). |
 
-- git commit -m "modifier le fichier README" `o` git push origin main 
+### Comportement
 
+- Le champ est contrôlé quand on le quitte (`blur`), puis à chaque frappe une fois en erreur.
+- À l'envoi, tous les champs sont contrôlés ; s'il reste une erreur, le formulaire n'est pas
+  envoyé et le premier champ fautif reçoit le focus.
+- Les règles sont lues dans l'ordre : `optional` (champ vide accepté), puis `required`, puis
+  `email` / `age`.
+- Cette validation est une **aide pour l'utilisateur** : la vraie protection est la validation
+  PHP du contrôleur, qui refait tous les contrôles.
 
+### Pages consommatrices
 
-<!-- Start of picture text -->
-= ©) Proiet-technoogies-web-2A / readme-guide Q type (Z}to search ~//Bl- | (/+- Oln\ a @<br><> Code © Issues 1) Pullrequests © Actions [F] Projects 1) wiki @ Security [~ Insights 3 Settings<br>readme-guide Pubic 5 Editing ~ — @Watch 0 ~ Y Fork 0 ~ fe Str 0 ~<br>B main ~ — # 1Branch © OTags Q Gotofile e+ ‘About 8<br>B oumeima-tbnéifekih mocitere fichier README 7500130-1minate a0 ©2Commits GuideREADME détaillé sur GitHub, pour rédiger un bon<br>(D README.ma modifier le fichier README Tminuteago ‘Readme<br>A Activity<br>00 README 2 & Custom properties<br>wr Ostars<br>© O watching<br>readme-guide FO forks<br>Report repository<br>Guide détailé pour rédiger un bon README sur GitHub pour le module projet technologies web<br>2A. Releases<br><!-- End of picture text -->
+- Page de connexion / inscription (`views/FrontOffice/login.php`) — module 1.
+- Formulaire du Back Office (`views/BackOffice/user-form.php`) — module 3.
 
-_Figure 3: Visualisation des modifications dans le repositorie_ 
+## Intégration finale
 
-2 
+Une fusion / pull request par étape, dans cet ordre :
 
-# **Structure recommandée pour un fichier README:** 
+1. **Mariem Marzouk** (4/6) — `config.php`, `database.sql`, `models/User.php`
+2. **Khadija Arfa** (5/6) — `controllers/UserController.php`
+3. **Tasnim Debbiche** (2/6) — Front Office, `style.css`, logo
+4. **Youssef Khmiri** (6/6) — `app.js` (validation)
+5. **Yasmine Ben Miled** (1/6) — connexion / inscription, `auth.css`
+6. **Mariem Chiboub** (3/6) — Back Office
+7. **Youssef Khmiri** (6/6) — `index.php`, vérification complète, tests, README.md, puis push de
+   la version finale
 
-Nous allons utiliser un langage de balisage Markdown. Ce dernier est utilisé pour formater du texte de manière simple et lisible. Il est principalement utilisé dans des fichiers comme les README sur GitHub, les blogs ou les forums. 
+La structure respecte l'étude de cas : `config.php`, `models/`, `controllers/`, `views/`
+(`assets`, `FrontOffice`, `BackOffice`).
 
-Nous allons suivre la structure suivante : 
+## Scénarios de test
 
-**1. Titre du Projet :** Le titre doit être clair et explicite. 
+| Scénario | Résultat attendu |
+| --- | --- |
+| Visiteur non connecté ouvre le Front Office ou le Back Office | Redirection vers la connexion. |
+| Connexion avec un e-mail invalide ou un mot de passe vide | Message d'erreur, pas de connexion. |
+| Connexion avec un mauvais mot de passe | « E-mail ou mot de passe incorrect ». |
+| Inscription valide | Compte créé avec le type « normal », retour à l'onglet Connexion. |
+| Inscription avec âge 0 ou 200, ou e-mail déjà utilisé | Refusée avec message. |
+| Inscription en tentant d'envoyer `type=admin` | Le compte est quand même « normal ». |
+| Utilisateur normal connecté | Arrive au Front Office ; l'URL du Back Office le renvoie au Front Office. |
+| Administrateur connecté | Arrive au Back Office ; peut ajouter, modifier, supprimer. |
+| Administrateur change le type d'un utilisateur en « admin » | Pris en compte immédiatement. |
+| Administrateur essaie de se supprimer ou de se retirer le rôle admin | Refusé. |
+| Formulaire sans jeton CSRF | Refusé. |
+| Déconnexion puis retour arrière | La page protégée n'est plus accessible. |
+| Ouvrir directement `...UserController.php?action=logout` | Ne déconnecte pas (POST + CSRF exigés). |
+| 5 mots de passe faux de suite | « Trop de tentatives échouées », connexion bloquée 60 s, même avec le bon mot de passe. |
+| Inactivité (`SESSION_TIMEOUT` à 10, attendre 11 s) | Retour à la connexion avec « Votre session a expiré ». |
+| Cookie de session dans les outils développeur | `MEDLINKSESSID` avec `HttpOnly` et `SameSite=Lax`. |
 
+## Contribution
 
+### Contributeur
 
-<!-- Start of picture text -->
-# readme-guide<br>Guide détaillé pour rédiger un bon README sur GitHub pour le module projet<br>technologies web 2A.<br># c'est un element h1<br># Nom du Projet<br><!-- End of picture text -->
+- **Youssef Khmiri** — validation JavaScript des formulaires, `index.php`, vérification
+  complète, tests et README du repository.
 
-_Figure 4: Contenu du fichier readme section titre projet_ 
+### Comment contribuer ?
 
-**2. Description du Projet** 
+Les commits doivent être faits par l'étudiant lui-même, avec son compte GitHub, afin que sa
+contribution soit visible dans l'historique du repository.
 
-Une brève description du projet : 
+1. **Forkez le projet**, puis clonez votre fork :
 
-- Son objectif 
+   ```bash
+   git clone https://github.com/votre-utilisateur/Template-Projet-Web.git
+   cd "Template Projet Web"
+   ```
 
-- Le problème qu'il résout 
+2. **Créez une branche** en respectant la nomenclature du professeur :
 
-- Ses principales fonctionnalités 
+   ```bash
+   git checkout -b feature/input-validation
+   ```
 
+3. **Modifiez les fichiers**, puis validez et poussez :
 
+   ```bash
+   git add .
+   git commit -m "Validation JavaScript des formulaires"
+   git push origin feature/input-validation
+   ```
 
-<!-- Start of picture text -->
-# readme-guide<br>Guide détaillé pour rédiger un bon README sur GitHub pour le module projet<br>technologies web 2A.<br># Nom du Projet<br>## c'est un element h2<br>## Description<br>ProjetManagement est une application web de gestion des projets.<br><!-- End of picture text -->
+4. Ouvrez une **pull request** vers la branche principale.
 
-_Figure 5: Contenu du fichier readme section description_ 
+### Suivi Git
 
-### **3. Table des Matières (Si README long)** 
+- **Branche du module :** `feature/input-validation`
+- **Exemples de messages de commit :** « Validation JavaScript des formulaires », « Fusion
+  finale, tests et README.md du repository »
+- **Tâche du GitHub Project Board :** « Validation des saisies, intégration finale et README »
 
-Ce morceau de code définit une **table des matières** (ou sommaire) cliquable pour un fichier README sur GitHub : 
+## Licence
 
-3 
+Ce projet est sous la licence **MIT**. Pour plus de détails, consultez le fichier
+[LICENSE](./LICENSE).
 
+### Détails sur la licence MIT
 
+La licence MIT est une licence de logiciel libre, courte et permissive : elle autorise
+l'utilisation, la modification et la redistribution du code, y compris à des fins commerciales,
+à condition de conserver l'avis de copyright et le texte de la licence. Le logiciel est fourni
+« en l'état », sans garantie d'aucune sorte.
 
-_Figure 6: Contenu du fichier readme section table des matières_ 
+---
 
-- **Chaque élément de la liste est un lien interne** qui redirige vers une section spécifique du README. 
+### Annexe — Points à maîtriser pour la validation
 
-- **Les ancres (** **`#installation` ,** **`#utilisation` , etc.)** correspondent aux titres des sections du README. 
-
-- **GitHub génère automatiquement ces ancres** en fonction des titres `##` du fichier README. 
-
-
-
-_Figure 7: Contenu du fichier readme section table des matières_ 
-
-**4. Installation :** Décrire les étapes pour installer et configurer le projet. 
-
-
-
-_Figure 8: Contenu du fichier readme section installation_ 
-
-4 
-
-- **Le chiffre 1. au début des lignes** : 
-
-      - En Markdown, on utilise 1. pour créer une liste numérotée. Peu importe si on met 1. à chaque ligne, GitHub les affichera automatiquement dans l'ordre correct (1, 2, 3…). 
-
-      - Ici, 1. Clonez le repository : crée un premier élément dans une liste ordonnée. 
-
-- **Les astérisques *** : 
-
-      - En Markdown, les * sont utilisés pour créer une liste à puces (liste non ordonnée). 
-
-      - Ici, ils permettent d’indiquer des sous-étapes sans imposer d’ordre précis 
-
-- Les triples backticks (```) sont utilisés pour créer un bloc de code. 
-
-   - Le mot-clé **bash** après les backticks indique que le bloc contient des commandes pour le terminal (shell Bash). 
-
-Cela permet à GitHub d'afficher la syntaxe en couleur pour une meilleure lisibilité. 
-
-
-
-<!-- Start of picture text -->
-D Reaowe oz<br>= Installation<br>“= Uslisation<br>‘= Contributions<br>+ cence<br>Installation<br>1. Clonez le repository<br>it clone hetps://aithub.con/utilisateur/projet.oit eo<br>ed projet<br>2.<br>Sivous utlisez WAMPou XAMPP :<br>‘+ Place2le projet dans le dossier www (WAMP) ou tdocs (XAMPP).<br>‘+ Démarrez Apacheet MySQL depuis interface de WAMP/XAMPP.<br>+ Acoédez au projet via httpy/locaihost/projet.<br><!-- End of picture text -->
-
-_Figure 9: Visualisation des modifications dans le repositorie_ 
-
-   - Modifier le lien du repository **github** associé à votre projet. 
-
-**5. Utilisation :** Décrire ce que vous devez utiliser dans le projet (php est un exemple) 
-
-5 
-
-
-
-_Figure 10: Contenu du fichier readme section utilisation_ 
-
-- ### Installation de PHP : C’est un en-tête de niveau 3, donc une sous-catégorie sous "Utilisation". 
-
-- Pour insérer un lien dans Markdown, tu utilises la syntaxe **[texte du lien](URL)** 
-
-- Rendre le texte en **gras** ou _italique_ : 
-
-   - **Gras** : Utiliser `**` autour du texte pour le mettre en gras. 
-
-   - _Italique_ : Utiliser `*` autour du texte pour l'italique. 
-
-
-
-_Figure 11: Visualisation des modifications dans le repositorie_ 
-
-### **6. Contribution** 
-
-6 
-
-
-
-<!-- Start of picture text -->
-## Contributions<br>Nous remercions tous ceux qui ont contribué a ce projet !<br>### Contributeurs<br>Les personnes suivantes ont contribué ce projet en ajoutant des fonctionnalités, en corrigeant des bugs ou en anéliorant la<br>documentation :<br>~ [Utilisateuri](https: //github.con/utilisateurl) - Correction de bugs et anélioration des performances etc ...<br>~ [Utilisateur2](https: //github.con/utilisateur2) - Ajout de la fonctionnalité X etc ...<br>~ [Utilisateur3](https: //github. con/utilisateur3) - Rédaction de la documentation etc ...<br>Si vous souhaitez contribuer, suivez les étapes ci-dessous pour faire un x#forkes, créer une nouvelle branche et soumettre une +*pull<br>request.<br>### Comment contribuer 7<br>1, *#Fork Le projetes : Allez sur la page GitHub du projet et cliquez sur le bouton #+#Forkes dans le coin supérieur droit pour créer<br>une copie du projet dans votre propre compte GitHub.<br>2. #eClonez votre forket : Clonez le fork sur votre machine locale :<br>“bash<br>git clone https://github.con/votre-utilisateur/projet.git<br>cd projet<br><!-- End of picture text -->
-
-_Figure 12: Contenu du fichier readme section contribution_ 
-
-
-
-<!-- Start of picture text -->
-Contributions<br>Nous remercions tous ceux qui ont contribué a ce projet !<br>Contributeurs<br>Les personnes suivantes ont contribué a ce projet en ajoutant des fonctionnalités, en corrigeant des bugs ou en<br>améliorant la documentation :<br>* Utilisateur1 - Correction de bugs et amélioration des performances etc ...<br>* Utilisateur2 - Ajout de la fonctionnalité X etc ...<br>* Utilisateur3 - Rédaction de la documentation etc ...<br>Si vous souhaitez contribuer, suivez les étapes ci-dessous pour faire un fork, créer une nouvelle branche et<br>soumettre une pull request.<br>Comment contribuer ?<br>1. Fork le projet : Allez sur la page GitHub du projet et cliquez sur le bouton Fork dans le coin supérieur droit<br>pour créer une copie du projet dans votre propre compte GitHub.<br>2. Clonez votre fork : Clonez le fork sur votre machine locale :<br>git clone https://github.com/votre-utilisateur/projet.git oa<br>cd projet<br><!-- End of picture text -->
-
-_Figure 13:  Visualisation des modifications dans le repositorie_ 
-
-7 
-
-**7. Licence** : Une description simple de la licence du projet Cela permet aux utilisateurs de savoir sous quelles conditions ils peuvent utiliser, modifier et redistribuer le code. Choisir une autre licence afin d’adapter cette section en conséquence. 
-
-
-
-<!-- Start of picture text -->
-## Licence<br>### Exemple pour **Licences* :<br>**\markdown<br>## Licence<br>Ce projet est sous la Licence +#XXX#*. Pour plus de détails, consultez le fichier [LICENSE] (./LICENSE) .<br>### Détails sur la licence MIT<br>La licence XXX est une licence de logiciel ...<br><!-- End of picture text -->
-
-_Figure 14: Contenu du fichier readme section licence_ 
-
-
-
-<!-- Start of picture text -->
-Licence<br>Exemple pour Licence :<br>## Licence oa<br>Ce projet est sous la licence **XXX**. Pour plus de détails, consultez le fichier [LICENSE](<br>### Détails sur la licence MIT<br>La licence XxX est une licence de logiciel ...<br>SS<br><!-- End of picture text -->
-
-_Figure 15: Visualisation des modifications dans le repositorie_ 
-
-Avec ces sections, ton README sera complet et donnera une idée claire de la manière de contribuer au projet et de respecter les conditions d'utilisation. 
-
-8 
-
+- Rôle de la validation client (JavaScript) par rapport à la validation serveur (PHP).
+- Fonctionnement de `data-rule` et des messages d'erreur.
+- Ordre de fusion des branches et résolution d'un éventuel conflit Git.
